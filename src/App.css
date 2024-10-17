@@ -1,0 +1,87 @@
+.App {
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 210px;
+  margin-top: -400px;
+}
+
+nav ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  justify-content: space-around;
+  background-color: #e5d30f;
+  padding: 10px 0;
+  border-radius: 1em;
+  margin-top: 20px;
+}
+nav ul li {
+  background-color: rgb(255, 0, 0);
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #ededed;
+  font-weight: bold;
+}
+
+h1, h2 {
+  color: #004285;
+  padding: 10px;
+  text-shadow: 
+        0 0 5px #00fdf8,   /* Light glow */
+        0 0 10px #0ed98b,  /* Medium glow */
+        0 0 15px #00ff80,  /* Strong glow */
+        0 0 20px #00fdf8; 
+}
+
+form {
+  display: flex;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+ul {
+  list-style-type: none;
+  padding: 20px;
+  gap: 35px;
+}
+
+li {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #000000;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 5px;
+}
+
+li button {
+  margin-left: 10px;
+  background-color: #004285;
+}
