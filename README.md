@@ -1,7 +1,7 @@
 
 _________________________________________
-|                                       
- Automated Document Verification System |                                   
+                                      
+|Automated Document Verification System |                                   
 -----------------------------------------
 This project is a platform for verifying official documents using blockchain technology. It helps ensure document integrity and offers a responsive web interface for users.
 
