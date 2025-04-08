@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import '../IssuingAuthority.css';
 
 const IssuingAuthority = () => {
   const [documentType, setDocumentType] = useState('');
@@ -19,7 +21,6 @@ const IssuingAuthority = () => {
         issueDate: new Date().toISOString()
       };
 
-      // Simulate blockchain storage using localStorage
       const blockchain = JSON.parse(localStorage.getItem('blockchain') || '[]');
       blockchain.push(document);
       localStorage.setItem('blockchain', JSON.stringify(blockchain));
@@ -32,10 +33,10 @@ const IssuingAuthority = () => {
   };
 
   return (
-    <div>
-      <h1>Issuing Authority Portal</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <div className="issuing-container">
+      <h1 className="page-title">Issuing Authority Portal</h1>
+      <form onSubmit={handleSubmit} className="upload-form">
+        <div className="form-group">
           <label htmlFor="documentType">Document Type:</label>
           <select
             id="documentType"
@@ -49,7 +50,8 @@ const IssuingAuthority = () => {
             <option value="experienceCertificate">Experience Certificate</option>
           </select>
         </div>
-        <div>
+
+        <div className="form-group">
           <label htmlFor="file">Upload Document:</label>
           <input
             type="file"
@@ -58,9 +60,14 @@ const IssuingAuthority = () => {
             required
           />
         </div>
-    
+
         <button type="submit">Generate and Store Document</button>
       </form>
+
+      {/* Back to Home at bottom */}
+      <Link to="/" className="back-home">
+        ← Back to Home
+      </Link>
     </div>
   );
 };

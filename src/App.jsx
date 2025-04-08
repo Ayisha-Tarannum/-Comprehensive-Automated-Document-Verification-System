@@ -1,22 +1,28 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link, useLocation } from 'react-router-dom';
 import './App.css';
 import Home from './components/Home';
 import IssuingAuthority from './components/IssuingAuthority';
 import VerifyingAuthority from './components/VerifyingAuthority';
 import Individual from './components/Individual';
 
-function App() {
-  return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/issuing" element={<IssuingAuthority />} />
-          <Route path="/verifying" element={<VerifyingAuthority />} />
-          <Route path="/individual" element={<Individual />} />
-        </Routes>
+function AppContent() {
+  const location = useLocation();
 
+  // Routes where the navigation bar should be hidden
+  const hideNavRoutes = ['/','/issuing', '/verifying', '/individual'];
+  const hideNav = hideNavRoutes.includes(location.pathname);
+
+  return (
+    <div className="App">
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/issuing" element={<IssuingAuthority />} />
+        <Route path="/verifying" element={<VerifyingAuthority />} />
+        <Route path="/individual" element={<Individual />} />
+      </Routes>
+
+      {!hideNav && (
         <nav>
           <ul>
             <li><Link to="/">Home</Link></li>
@@ -25,8 +31,15 @@ function App() {
             <li><Link to="/individual">Individual</Link></li>
           </ul>
         </nav>
+      )}
+    </div>
+  );
+}
 
-      </div>
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }

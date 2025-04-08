@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../Individual.css';
 
 const Individual = () => {
   const [documents, setDocuments] = useState([]);
@@ -16,11 +17,17 @@ const Individual = () => {
       <ul>
         {documents.map((doc) => (
           <li key={doc.id}>
+          <span className="doc-info">
             {doc.type} - ID: {doc.id} - Issued on: {new Date(doc.issueDate).toLocaleDateString()}
-            <button onClick={() => alert(`Document content: ${doc.content}`)}>View</button>
-          </li>
+          </span>
+          <button onClick={() => alert(`Document content: ${doc.content}`)}>View</button>
+        </li>        
         ))}
       </ul>
+
+      <div className="back-to-home">
+        <a href="/">← Back to Home</a>
+      </div>
     </div>
   );
 };
