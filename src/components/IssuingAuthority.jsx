@@ -5,19 +5,31 @@ import '../IssuingAuthority.css';
 const IssuingAuthority = () => {
   const [documentType, setDocumentType] = useState('');
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !documentType) {
+      alert("Please select a document type and file.");
+      return;
+    }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target.result;
-      const documentId = Math.random().toString(36).substr(2, 9);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('documentType', documentType);
+
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/issue', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
       const document = {
-        id: documentId,
+        id: data.documentId,
         type: documentType,
-        content: content,
+        content: data.extractedText,
         issueDate: new Date().toISOString()
       };
 
@@ -25,11 +37,14 @@ const IssuingAuthority = () => {
       blockchain.push(document);
       localStorage.setItem('blockchain', JSON.stringify(blockchain));
 
-      alert(`Document stored with ID: ${documentId}`);
+      alert(`✅ Document issued successfully with ID: ${data.documentId}`);
       setDocumentType('');
       setFile(null);
-    };
-    reader.readAsDataURL(file);
+    } catch (error) {
+      alert(`❌ Error issuing document: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,18 +71,18 @@ const IssuingAuthority = () => {
           <input
             type="file"
             id="file"
+            accept=".pdf,.docx,.jpg,.jpeg,.png"
             onChange={(e) => setFile(e.target.files[0] || null)}
             required
           />
         </div>
 
-        <button type="submit">Generate and Store Document</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Processing...' : 'Generate and Store Document'}
+        </button>
       </form>
 
-      {/* Back to Home at bottom */}
-      <Link to="/" className="back-home">
-        ← Back to Home
-      </Link>
+      <Link to="/" className="back-home">← Back to Home</Link>
     </div>
   );
 };
