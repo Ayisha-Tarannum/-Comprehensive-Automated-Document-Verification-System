@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useBlockchain } from './BlockchainContext'; 
 import '../IssuingAuthority.css';
 
 const IssuingAuthority = () => {
   const [documentType, setDocumentType] = useState('');
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { addDocument } = useBlockchain();
+
+  // ✅ Restrict access to issuer role
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (role !== 'issuer') {
+      alert("Access denied. Please login as Issuing Authority.");
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file || !documentType) {
-      alert("Please select a document type and file.");
+
+    if (!documentType || !file) {
+      alert('Please select a document type and upload a file.');
       return;
     }
 
@@ -20,28 +33,44 @@ const IssuingAuthority = () => {
 
     try {
       setLoading(true);
+
       const response = await fetch('http://localhost:5000/issue', {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
+
+      if (!data.documentId) {
+        throw new Error('No document ID received from backend.');
+      }
+
       const document = {
         id: data.documentId,
         type: documentType,
         content: data.extractedText,
-        issueDate: new Date().toISOString()
+        issueDate: new Date().toISOString(),
+        issuer: localStorage.getItem('username'),
+        verified_by: null,
       };
 
-      const blockchain = JSON.parse(localStorage.getItem('blockchain') || '[]');
-      blockchain.push(document);
-      localStorage.setItem('blockchain', JSON.stringify(blockchain));
+      const success = addDocument(document);
+      if (success) {
+        console.log('✅ Document added to blockchain:', document);
+        alert(`✅ Document issued with ID: ${data.documentId}`);
+      } else {
+        console.warn('⚠️ Document already exists in blockchain.');
+        alert('⚠️ Document already exists.');
+      }
 
-      alert(`✅ Document issued successfully with ID: ${data.documentId}`);
+      // Reset state and form
       setDocumentType('');
       setFile(null);
+      e.target.reset();
+
     } catch (error) {
-      alert(`❌ Error issuing document: ${error.message}`);
+      console.error('❌ Error issuing document:', error);
+      alert(`❌ Error: ${error.message}`);
     } finally {
       setLoading(false);
     }

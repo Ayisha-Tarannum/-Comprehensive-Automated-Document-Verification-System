@@ -1,22 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useBlockchain } from './BlockchainContext'; // ✅ Adjust path if needed
 import '../VerifyingAuthority.css';
 
 const VerifyingAuthority = () => {
-  const [documentId, setDocumentId] = useState('');
   const [file, setFile] = useState(null);
   const [verificationResult, setVerificationResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { verifyDocument } = useBlockchain(); // ✅ context hook
+
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (role !== 'verifier') {
+      alert("Access denied. Please login as a Verifying Authority.");
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const handleVerify = async (e) => {
     e.preventDefault();
-    if (!file || !documentId) {
-      alert("Please enter Document ID and upload a file.");
+    if (!file) {
+      alert("Please upload a document.");
       return;
     }
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('documentId', documentId);
+    formData.append('verifier', localStorage.getItem('username'));
 
     try {
       setLoading(true);
@@ -27,7 +38,14 @@ const VerifyingAuthority = () => {
 
       const data = await response.json();
       setVerificationResult(data.message);
+
+      // ✅ Update blockchain if matched_id is present
+      if (data.message.includes("✅") && data.matched_id) {
+        verifyDocument(data.matched_id, localStorage.getItem('username'));
+      }
+
     } catch (error) {
+      console.error('Verification error:', error);
       setVerificationResult('❌ Error during verification: ' + error.message);
     } finally {
       setLoading(false);
@@ -38,16 +56,6 @@ const VerifyingAuthority = () => {
     <div className="verify-container">
       <h1 className="verify-title">Verifying Authority Portal</h1>
       <form className="verify-form" onSubmit={handleVerify}>
-        <div className="form-group">
-          <label htmlFor="documentId">Document ID:</label>
-          <input
-            type="text"
-            id="documentId"
-            value={documentId}
-            onChange={(e) => setDocumentId(e.target.value)}
-            required
-          />
-        </div>
         <div className="form-group">
           <label htmlFor="file">Upload Document for Verification:</label>
           <input
